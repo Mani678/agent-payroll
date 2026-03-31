@@ -24,7 +24,7 @@ export async function runAgent(
   task: string
 ): Promise<AgentResult> {
   const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 1024,
     system: SYSTEM_PROMPTS[agentType],
     messages: [{ role: "user", content: task }],

@@ -50,7 +50,8 @@ export default function Dashboard() {
           fetch(`${API}/api/logs`),
           fetch(`${API}/api/status`),
         ]);
-        setLogs(await logsRes.json());
+        const logsData = await logsRes.json();
+        setLogs(Array.isArray(logsData) ? logsData : []);
         const status = await statusRes.json();
         setPausedState(status.paused);
       } catch { }

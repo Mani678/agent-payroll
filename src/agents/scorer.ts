@@ -15,7 +15,7 @@ export async function scoreOutput(
   output: string
 ): Promise<ScoreResult> {
   const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 256,
     system: `You are a strict output quality evaluator. Given a task and an agent's output, score the output from 0.0 to 1.0. Return ONLY valid JSON in this format: {"score": 0.0, "reason": "brief reason"}. Nothing else.`,
     messages: [

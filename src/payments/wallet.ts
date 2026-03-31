@@ -1,6 +1,11 @@
-import { v4 as uuidv4 } from "uuid";
+import * as StellarSdk from "@stellar/stellar-sdk";
+import axios from "axios";
 import dotenv from "dotenv";
 dotenv.config();
+
+const server = new StellarSdk.Horizon.Server(
+  process.env.STELLAR_HORIZON_URL || "https://horizon-testnet.stellar.org"
+);
 
 export interface AgentWallet {
   publicKey: string;
@@ -8,19 +13,30 @@ export interface AgentWallet {
 }
 
 export async function generateWallet(): Promise<AgentWallet> {
-  const id = uuidv4().replace(/-/g, "").toUpperCase();
+  const keypair = StellarSdk.Keypair.random();
+  await fundTestnetWallet(keypair.publicKey());
   return {
-    publicKey: "G" + id.substring(0, 55),
-    secretKey: "S" + id.substring(0, 55),
+    publicKey: keypair.publicKey(),
+    secretKey: keypair.secret(),
   };
 }
 
 export async function fundTestnetWallet(publicKey: string): Promise<void> {
-  console.log(`[mock] funded wallet ${publicKey.slice(0, 8)}...`);
+  await axios.get(
+    `https://friendbot.stellar.org?addr=${publicKey}`
+  );
 }
 
 export async function getBalance(publicKey: string): Promise<number> {
-  return 100.0;
+  try {
+    const account = await server.loadAccount(publicKey);
+    const xlmBalance = account.balances.find(
+      (b: any) => b.asset_type === "native"
+    );
+    return xlmBalance ? parseFloat(xlmBalance.balance) : 0;
+  } catch {
+    return 0;
+  }
 }
 
 export async function sendPayment(
@@ -28,14 +44,28 @@ export async function sendPayment(
   toPublicKey: string,
   amount: string
 ): Promise<string> {
-  const mockHash = uuidv4().replace(/-/g, "");
-  console.log(`[mock] payment ${amount} XLM → ${toPublicKey.slice(0, 8)}... tx:${mockHash.slice(0, 8)}`);
-  return mockHash;
+  const fromKeypair = StellarSdk.Keypair.fromSecret(fromSecret);
+  const fromAccount = await server.loadAccount(fromKeypair.publicKey());
+
+  const transaction = new StellarSdk.TransactionBuilder(fromAccount, {
+    fee: StellarSdk.BASE_FEE,
+    networkPassphrase: StellarSdk.Networks.TESTNET,
+  })
+    .addOperation(
+      StellarSdk.Operation.payment({
+        destination: toPublicKey,
+        asset: StellarSdk.Asset.native(),
+        amount: amount,
+      })
+    )
+    .setTimeout(30)
+    .build();
+
+  transaction.sign(fromKeypair);
+  const result = await server.submitTransaction(transaction);
+  return result.hash;
 }
 
-export async function getManagerKeypair(): Promise<any> {
-  return {
-    publicKey: () => process.env.MANAGER_PUBLIC_KEY || "GMOCK",
-    secret: () => process.env.MANAGER_SECRET_KEY || "SMOCK",
-  };
+export async function getManagerKeypair(): Promise<StellarSdk.Keypair> {
+  return StellarSdk.Keypair.fromSecret(process.env.MANAGER_SECRET_KEY!);
 }
