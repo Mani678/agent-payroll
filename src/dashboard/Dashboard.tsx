@@ -26,7 +26,6 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [tick, setTick] = useState(0);
   const [logs, setLogs] = useState<any[]>([]);
-  const [paused, setPausedState] = useState(false);
 
   useEffect(() => {
     const t = setInterval(() => setTick(n => n + 1), 1000);
@@ -38,7 +37,7 @@ export default function Dashboard() {
       const res = await fetch(`${API}/api/jobs`);
       const data = await res.json();
       setJobs(data.reverse());
-    } catch { }
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -46,15 +45,10 @@ export default function Dashboard() {
     const interval = setInterval(async () => {
       fetchJobs();
       try {
-        const [logsRes, statusRes] = await Promise.all([
-          fetch(`${API}/api/logs`),
-          fetch(`${API}/api/status`),
-        ]);
+        const logsRes = await fetch(`${API}/api/logs`);
         const logsData = await logsRes.json();
         setLogs(Array.isArray(logsData) ? logsData : []);
-        const status = await statusRes.json();
-        setPausedState(status.paused);
-      } catch { }
+      } catch {}
     }, 5000);
     return () => clearInterval(interval);
   }, [fetchJobs]);
@@ -82,18 +76,6 @@ export default function Dashboard() {
     }
   }
 
-  async function togglePause() {
-    try {
-      const res = await fetch(`${API}/api/pause`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paused: !paused }),
-      });
-      const data = await res.json();
-      setPausedState(data.paused);
-    } catch { }
-  }
-
   const allAgents = activeJob?.agents || [];
   const elapsed = activeJob
     ? Math.round((Date.now() - new Date(activeJob.startedAt).getTime()) / 1000)
@@ -113,51 +95,9 @@ export default function Dashboard() {
         <h1 style={{ fontFamily: "var(--mono)", fontSize: 28, fontWeight: 600, color: "var(--green)", letterSpacing: "-0.02em", marginBottom: 4 }}>
           agent_payroll<span style={{ color: "var(--text-faint)" }}>_</span>
         </h1>
-        <p style={{ fontSize: 14, color: "var(--text-dim)", fontWeight: 300, marginBottom: 12 }}>
+        <p style={{ fontSize: 14, color: "var(--text-dim)", fontWeight: 300 }}>
           Autonomous agents that work, earn, and get replaced — payments on Stellar via x402
         </p>
-
-        {/* Autonomy status + kill switch row */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" as const }}>
-          <div style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "6px 12px",
-            borderRadius: 6,
-            border: "1px solid rgba(0,255,136,0.2)",
-            background: "rgba(0,255,136,0.05)",
-          }}>
-            <div style={{
-              width: 6, height: 6, borderRadius: "50%",
-              background: paused ? "var(--amber)" : "var(--green)",
-              boxShadow: paused ? "0 0 8px var(--amber)" : "0 0 8px var(--green)",
-              animation: "pulse-dot 1.5s ease infinite",
-            }} />
-            <span style={{ fontFamily: "var(--mono)", fontSize: 11, color: paused ? "var(--amber)" : "var(--green)", letterSpacing: "0.1em" }}>
-              {paused ? "scheduler paused" : "3 autonomous objectives running"}
-            </span>
-          </div>
-
-          <button
-            onClick={togglePause}
-            style={{
-              padding: "6px 14px",
-              fontSize: 11,
-              fontFamily: "var(--mono)",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase" as const,
-              borderRadius: 6,
-              border: paused ? "1px solid rgba(0,255,136,0.3)" : "1px solid rgba(255,77,106,0.3)",
-              background: paused ? "rgba(0,255,136,0.08)" : "rgba(255,77,106,0.08)",
-              color: paused ? "var(--green)" : "var(--red)",
-              cursor: "pointer",
-              transition: "all 0.2s",
-            }}
-          >
-            {paused ? "▶ resume scheduler" : "⏸ pause scheduler"}
-          </button>
-        </div>
       </div>
 
       {/* Input Panel */}
@@ -212,8 +152,6 @@ export default function Dashboard() {
       {/* Active Job */}
       {activeJob && (
         <div className="animate-in">
-
-          {/* Stats Bar */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 10, marginBottom: "1.25rem" }}>
             {[
               { label: "status", value: activeJob.status, color: activeJob.status === "done" ? "var(--green)" : "var(--amber)" },
@@ -233,7 +171,6 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* Goal display */}
           <div style={{
             background: "var(--green-faint)",
             border: "1px solid var(--green-border)",
@@ -247,14 +184,12 @@ export default function Dashboard() {
             <span style={{ color: "var(--text-faint)" }}>goal: </span>{activeJob.goal}
           </div>
 
-          {/* Agent Cards */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 10, marginBottom: "1.25rem" }}>
             {allAgents.map((agent) => (
               <AgentCard key={agent.id} agent={agent} />
             ))}
           </div>
 
-          {/* Tx Feed */}
           <div style={{ marginBottom: "1.25rem" }}>
             <p style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text-faint)", margin: "0 0 8px", textTransform: "uppercase" as const, letterSpacing: "0.1em" }}>
               transaction feed
@@ -262,7 +197,6 @@ export default function Dashboard() {
             <TxFeed agents={allAgents} />
           </div>
 
-          {/* Results */}
           {Object.keys(activeJob.results).length > 0 && (
             <div style={{
               background: "var(--surface)",
@@ -370,8 +304,8 @@ export default function Dashboard() {
                   fontSize: 11,
                   color: entry.level === "success" ? "var(--green)"
                     : entry.level === "error" ? "var(--red)"
-                      : entry.level === "warn" ? "var(--amber)"
-                        : "var(--text-dim)",
+                    : entry.level === "warn" ? "var(--amber)"
+                    : "var(--text-dim)",
                   lineHeight: 1.5,
                 }}>
                   {entry.message}
