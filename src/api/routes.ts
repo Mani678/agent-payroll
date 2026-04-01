@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import { runJob, getJob, getAllJobs } from "../agents/manager";
-import { startScheduler, getObjectives } from "../agents/scheduler";
 import { getLogs, isPaused, setPaused } from "../api/logger";
 import dotenv from "dotenv";
 dotenv.config();
@@ -58,12 +57,4 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-app.get("/api/objectives", (_req, res) => {
-  res.json(getObjectives());
-});
-
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Agent Payroll API running on port ${PORT}`);
-  startScheduler();
-});
