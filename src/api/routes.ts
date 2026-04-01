@@ -58,3 +58,6 @@ app.get("/api/health", (_req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Agent Payroll API running on port ${PORT}`);
+});
