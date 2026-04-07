@@ -1,29 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --green: #00ff88;
-  --green-dim: #00cc6a;
-  --green-faint: rgba(0, 255, 136, 0.07);
-  --green-border: rgba(0, 255, 136, 0.18);
-  --green-glow: rgba(0, 255, 136, 0.12);
-  --bg: #080b09;
-  --bg2: #0d120e;
-  --bg3: #111a12;
-  --surface: #0f1710;
-  --surface2: #162018;
-  --border: rgba(0, 255, 136, 0.12);
-  --border-bright: rgba(0, 255, 136, 0.3);
-  --text: #e8f5ee;
-  --text-dim: #7aab8a;
-  --text-faint: #3d6b4a;
+  --bg: #0a0a0f;
+  --bg2: #0f0f18;
+  --surface: #13131f;
+  --surface2: #1a1a28;
+  --border: rgba(255,255,255,0.06);
+  --border-bright: rgba(255,255,255,0.12);
+  --accent: #7c6fff;
+  --accent-dim: rgba(124,111,255,0.15);
+  --accent-glow: rgba(124,111,255,0.08);
+  --green: #00e5a0;
+  --green-dim: rgba(0,229,160,0.12);
   --red: #ff4d6a;
-  --red-faint: rgba(255, 77, 106, 0.08);
-  --amber: #ffb830;
-  --amber-faint: rgba(255, 184, 48, 0.08);
-  --mono: 'IBM Plex Mono', monospace;
-  --sans: 'IBM Plex Sans', sans-serif;
+  --red-dim: rgba(255,77,106,0.12);
+  --amber: #ffb347;
+  --amber-dim: rgba(255,179,71,0.12);
+  --text: #f0f0ff;
+  --text-dim: #8888aa;
+  --text-faint: #44445a;
+  --mono: 'DM Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --display: 'Syne', sans-serif;
 }
 
 html { background: var(--bg); }
@@ -34,17 +34,14 @@ body {
   color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,255,136,0.06) 0%, transparent 70%);
 }
 
-::selection { background: var(--green); color: var(--bg); }
+::selection { background: var(--accent); color: #fff; }
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
 
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--green-border); border-radius: 2px; }
-
-textarea, input, button, select { font-family: var(--sans); }
+textarea, input, button { font-family: var(--sans); }
 
 textarea {
   width: 100%;
@@ -52,86 +49,81 @@ textarea {
   font-size: 14px;
   font-family: var(--mono);
   padding: 14px 16px;
-  border-radius: 6px;
+  border-radius: 10px;
   border: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--surface2);
   color: var(--text);
   outline: none;
   line-height: 1.6;
-  transition: border-color 0.2s;
-  caret-color: var(--green);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  caret-color: var(--accent);
 }
-
-textarea:focus { border-color: var(--border-bright); box-shadow: 0 0 0 3px var(--green-glow); }
-textarea::placeholder { color: var(--text-faint); font-style: italic; }
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124,111,255,0.1);
+}
+textarea::placeholder { color: var(--text-faint); }
 
 input[type="number"] {
   font-size: 14px;
   font-family: var(--mono);
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--green);
+  background: var(--surface2);
+  color: var(--accent);
   outline: none;
   width: 90px;
   transition: border-color 0.2s;
-  caret-color: var(--green);
+  caret-color: var(--accent);
 }
-
-input[type="number"]:focus { border-color: var(--border-bright); box-shadow: 0 0 0 3px var(--green-glow); }
+input[type="number"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124,111,255,0.1);
+}
 
 button {
   padding: 10px 24px;
   font-size: 13px;
-  font-family: var(--mono);
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  border-radius: 6px;
-  border: 1px solid var(--green-border);
-  background: var(--green-faint);
-  color: var(--green);
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
   cursor: pointer;
   transition: all 0.2s;
-  position: relative;
-  overflow: hidden;
 }
-
 button:hover:not(:disabled) {
-  background: rgba(0, 255, 136, 0.12);
-  border-color: var(--green);
-  box-shadow: 0 0 16px var(--green-glow), inset 0 0 16px var(--green-glow);
+  background: #9b8fff;
+  border-color: #9b8fff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(124,111,255,0.3);
 }
-
-button:active:not(:disabled) { transform: scale(0.98); }
-
+button:active:not(:disabled) { transform: translateY(0); }
 button:disabled { opacity: 0.3; cursor: not-allowed; }
 
-button.danger {
-  border-color: rgba(255,77,106,0.3);
-  background: var(--red-faint);
-  color: var(--red);
-}
-
-a { color: var(--green-dim); text-decoration: none; }
-a:hover { color: var(--green); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #9b8fff; }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes score-fill {
+  from { width: 0%; }
+  to { width: var(--score-width); }
 }
 
-@keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
-}
-
-.animate-in { animation: fadeUp 0.4s ease both; }
-.animate-in-delay { animation: fadeUp 0.4s ease 0.1s both; }
-.animate-in-delay2 { animation: fadeUp 0.4s ease 0.2s both; }
+.animate-in { animation: fadeUp 0.5s ease both; }
+.animate-in-2 { animation: fadeUp 0.5s ease 0.1s both; }
+.animate-in-3 { animation: fadeUp 0.5s ease 0.2s both; }
